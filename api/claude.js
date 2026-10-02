@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   const { messages, system, max_tokens } = req.body;
   
   const parts = [];
-  if(system) parts.push({text: "INSTRUCTIONS: " + system});
+  if(system) parts.push({text: "CRITICAL: You must respond with ONLY raw JSON, no markdown, no explanation, no text before or after. Just the JSON object or array.\n\n" + system});
   
   messages.forEach(m => {
     if(Array.isArray(m.content)){
@@ -26,15 +26,16 @@ export default async function handler(req, res) {
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
         contents: [{parts}],
-        generationConfig: {maxOutputTokens: max_tokens || 8000}
+        generationConfig: {
+          maxOutputTokens: max_tokens || 8000,
+          temperature: 0.1
+        }
       }),
     }
   );
   
   const data = await response.json();
-  console.log("GEMINI RESPONSE:", JSON.stringify(data).slice(0,500));
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-  console.log("TEXT EXTRACTED:", text.slice(0,200));
   
   res.status(200).json({content: [{type:"text", text}]});
 }
