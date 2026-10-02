@@ -17,7 +17,10 @@ export default async function handler(req, res) {
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
         contents: [{parts: [{text: prompt}]}],
-        generationConfig: {maxOutputTokens: max_tokens || 8000}
+        generationConfig: {
+          maxOutputTokens: max_tokens || 8000,
+          responseMimeType: "application/json"
+        }
       }),
     }
   );
